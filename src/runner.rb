@@ -26,12 +26,17 @@ class Runner
   # - - - - - - - - - - - - - - - - - - - - - -
 
   def run_cyber_dojo_sh(image_name, id, files, max_seconds)
+    files = Hash[files.map{ |filename,file| [filename, file['content']] }]
+    run_cyber_dojo_sh2(image_name, id, files, max_seconds)
+  end
+
+  def run_cyber_dojo_sh2(image_name, id, files, max_seconds)
     container_name = create_container(image_name, id, max_seconds)
     command = tar_pipe_files_in_and_run_cyber_dojo_sh(container_name)
     stdout,stderr,status,timed_out = run(command, files, max_seconds)
     files_now = tar_pipe_text_files_out(container_name)
     if files_now === {} || timed_out
-      created,deleted,changed = {},{},{}
+      created,deleted,changed = {},[],{}
     else
       created,deleted,changed = files_delta(files, files_now)
     end
@@ -113,8 +118,8 @@ class Runner
 
   def tar_file_writer(files)
     writer = Tar::Writer.new
-    files.each do |filename,file|
-      writer.write(filename, file['content'])
+    files.each do |filename,content|
+      writer.write(filename, content)
     end
     writer
   end

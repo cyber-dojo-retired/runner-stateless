@@ -66,7 +66,7 @@ class SandboxRightsTest < TestBase
     filenames = stdout_stats.keys
     assert filenames.include?(filename)
     run_cyber_dojo_sh({
-      deleted: { "#{sub_dir}/#{filename}" => intact(content) }
+      deleted: [ "#{sub_dir}/#{filename}" ]
     })
     filenames = stdout_stats.keys
     refute filenames.include?(filename)
